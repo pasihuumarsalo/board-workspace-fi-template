@@ -1,0 +1,14 @@
+# Paikalliset, ei-julkaistavat tiedostot
+.paikallinen/
+
+# Käyttäjän oma aineisto, jota ei koskaan committoida templateen
+import/
+*.pdf
+~$*.docx
+
+# Ympäristö
+.env
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

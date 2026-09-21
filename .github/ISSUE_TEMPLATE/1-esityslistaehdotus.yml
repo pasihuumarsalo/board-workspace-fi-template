@@ -1,0 +1,30 @@
+name: Esityslistaehdotus
+description: Ehdota asiaa hallituksen kokouksen esityslistalle.
+title: "Esityslista: "
+labels: ["esityslistaehdotus"]
+body:
+  - type: markdown
+    attributes:
+      value: "Nosto ei ole päätös. Puheenjohtaja päättää, otetaanko asia esityslistalle."
+  - type: dropdown
+    id: tarkoitus
+    attributes:
+      label: Tarkoitus
+      options: ["Tiedoksi", "Keskusteltavaksi", "Päätettäväksi"]
+    validations:
+      required: true
+  - type: textarea
+    id: tausta
+    attributes:
+      label: Mistä on kyse
+    validations:
+      required: true
+  - type: textarea
+    id: paatettavaa
+    attributes:
+      label: Mitä hallituksen pitäisi ratkaista
+  - type: textarea
+    id: aineisto
+    attributes:
+      label: Aineisto
+      description: Mihin ehdotus perustuu. Älä liitä luottamuksellisia asiakirjoja Issueen.

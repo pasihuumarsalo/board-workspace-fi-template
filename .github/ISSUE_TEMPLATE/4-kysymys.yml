@@ -1,0 +1,15 @@
+name: Kysymys
+description: Kysy työtilasta, päätöksistä tai rajoitteista.
+title: "Kysymys: "
+labels: ["kysymys"]
+body:
+  - type: textarea
+    id: kysymys
+    attributes:
+      label: Kysymys
+    validations:
+      required: true
+  - type: textarea
+    id: konteksti
+    attributes:
+      label: Miksi tämä on tärkeä nyt

@@ -1,0 +1,28 @@
+# Yhtiön perustiedot. Täytetään käyttöönotossa (ALOITUS.md, vaihe 1).
+# null = ei vielä tiedossa. Älä jätä placeholdereita, merkitse puuttuva nullina.
+schema_version: 1
+record_type: company
+
+name: null                    # virallinen nimi kaupparekisterissä
+business_id: null             # Y-tunnus, muoto 1234567-8
+company_form: null            # oy | oyj | muu
+domicile: null                # kotipaikka
+industry: null                # toimiala lyhyesti
+fiscal_year:
+  starts: null                # esim. "01-01"
+  ends: null                  # esim. "12-31"
+has_ceo: null                 # true | false
+has_auditor: null             # true | false
+
+# Missä allekirjoitetut pöytäkirjat säilytetään. Paikan nimi, ei polku.
+minutes_archive: null         # esim. "SharePoint, Hallitus-kansio"
+
+# Tunnusten etuliite. Oletus PTK-/DEC-; yhtiö voi lisätä oman tunnuksen, esim. ABC-PTK-.
+id_prefix:
+  minutes: "PTK-"
+  decision: "DEC-"
+
+onboarding:
+  completed_at: null
+  completed_by: null
+  open_items: []              # mitä jäi käyttöönotossa avoimeksi

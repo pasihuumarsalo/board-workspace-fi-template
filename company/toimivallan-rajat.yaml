@@ -1,0 +1,41 @@
+# Toimivallan rajat: mitä laki, yhtiöjärjestys, yhtiökokous ja osakassopimus
+# edellyttävät hallitukselta tai rajoittavat sen toimivaltaa.
+#
+# Kirjataan VAIN velvoite ja sen lähdekohta. Ei sopimustekstiä, ei kaupallisia
+# ehtoja. Osakassopimuksesta poimitaan vain hallitusta koskevat kohdat.
+#
+# Normihierarkia (governance/05): laki > yhtiöjärjestys > yhtiökokous > osakassopimus.
+# Osakassopimus sitoo osakkaita, ei yhtiötä suoraan — merkitse source_type oikein.
+schema_version: 1
+record_type: authority_and_constraints
+status: provisional             # provisional | confirmed (puheenjohtaja tarkistanut)
+
+constraints:
+  # Esimerkki — korvaa yhtiön omilla.
+  # - id: AUTH-001
+  #   source_type: articles_of_association   # law | articles_of_association | general_meeting | shareholders_agreement | board_decision
+  #   source_reference: "Yhtiöjärjestys 5 §"
+  #   topic: Hallituksen jäsenmäärä
+  #   constraint: "Hallitukseen kuuluu 3–5 varsinaista jäsentä."
+  #   effect_on_board: "Kokoonpano ei saa alittaa kolmea; jos alittaa, yhtiökokous on kutsuttava koolle."
+  #   valid_from: 2024-01-01
+  #   valid_until: null
+  #   status: provisional
+  []
+
+# Yhtiökokouksen antamat valtuutukset (esim. osakeantivaltuutus) — määräaika näkyviin
+authorizations:
+  # - id: AUTH-YK-001
+  #   granted_by: "Varsinainen yhtiökokous 12.4.2026"
+  #   topic: Osakeantivaltuutus
+  #   scope: "Enintään 1 000 osaketta"
+  #   valid_until: 2027-04-12
+  #   used: false
+  #   status: provisional
+  []
+
+# Lähdeasiakirjat nimellä, ei polulla
+source_documents:
+  articles_of_association: null      # esim. "Yhtiöjärjestys, rekisteröity 3.2.2024"
+  shareholders_agreement: null       # esim. "Osakassopimus 15.6.2022" — sisältöä ei kopioida
+  general_meeting_minutes: []        # lista yhtiökokouspöytäkirjoista, joista on poimittu

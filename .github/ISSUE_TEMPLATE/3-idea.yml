@@ -1,0 +1,15 @@
+name: Idea
+description: Ajatus tulevasta. Keskeneräinen on tervetullut.
+title: "Idea: "
+labels: ["idea"]
+body:
+  - type: textarea
+    id: ajatus
+    attributes:
+      label: Ajatus
+    validations:
+      required: true
+  - type: textarea
+    id: liittyy
+    attributes:
+      label: Mihin se liittyy

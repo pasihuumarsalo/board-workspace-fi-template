@@ -1,0 +1,20 @@
+name: Havainto
+description: Jokin rekisterissä tai nykytilassa näyttää väärältä tai huomionarvoiselta.
+title: "Havainto: "
+labels: ["havainto"]
+body:
+  - type: input
+    id: kohde
+    attributes:
+      label: Mitä havainto koskee
+      description: DEC-, PTK-, AUTH- tai VK-tunnus, jos on.
+  - type: textarea
+    id: havainto
+    attributes:
+      label: Mitä huomasit
+    validations:
+      required: true
+  - type: textarea
+    id: peruste
+    attributes:
+      label: Mihin havainto perustuu

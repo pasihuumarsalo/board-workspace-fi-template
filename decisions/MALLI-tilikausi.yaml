@@ -1,0 +1,89 @@
+# Päätösrekisterin tilikausitiedoston malli. Kopioi nimelle <vuosi>.yaml ja
+# poista esimerkkisisältö. Kaikki kentät on kuvattu governance/03:ssa.
+schema_version: 1
+record_type: board_decision_register
+fiscal_year: "2026"                 # tilikausi
+minutes_range: null                 # esim. "PTK-000001 – PTK-000009", päivitetään
+period_open: true                   # true kunnes tilikausi on päättynyt ja pöytäkirjat allekirjoitettu
+
+record_authority:
+  # Mistä tekstit ovat peräisin ja missä auktoriteetti on.
+  authoritative_source: >-
+    Allekirjoitettu pöytäkirja yhtiön arkistossa (company/yhtio.yaml → minutes_archive).
+    Ristiriitatilanteessa alkuperäinen ratkaisee, ei tämä rekisteri.
+  interpretation_note: >-
+    Kentät effect_status, effect_note, *_note ja notable_findings ovat agentin tulkintoja.
+    Ne ovat ai_tulkinta-tilassa, kunnes ihminen vahvistaa ne.
+
+meetings:
+  - minutes_number: PTK-000001
+    decision_date: 2026-05-14        # päätöspäivä; monipäiväisessä viimeinen päivä
+    title: "Hallituksen kokous"
+    place: "Yhtiön toimisto, [osoite]"   # tai "Etäkokous (Teams)"
+    decision_method: meeting         # meeting | without_meeting
+    participants: []                 # läsnä olleet jäsenet, display_name
+    entitled_participants: []        # toimikauden jäsenet kokouspäivänä (company/hallituksen-kokoonpano.yaml)
+    invited_participants: []         # asiantuntijat, esittelijät — eivät jäseniä
+    quorum:
+      basis: "OYL 6:3 § — yli puolet jäsenistä läsnä"   # tai yhtiöjärjestyksen kohta, jos tiukempi
+      entitled_count: 0
+      present_count: 0
+      is_quorate: null
+      derived: true                  # laskettu listoista, ei kopioitu pöytäkirjasta
+    session:
+      opened_at: "2026-05-14 09:00"
+      closed_at: "2026-05-14 11:30"
+    signatures: []                   # täytetään kun allekirjoitettu
+    decision_text_status: odottaa_allekirjoitusta   # kopio | kopio_kuvasta | odottaa_allekirjoitusta
+    interpretation_status: ai_tulkinta              # ai_tulkinta | ihmisen_vahvistama
+    meeting_note: >-
+      Vapaa kuvaus kokouksen kulusta. Tähän myös se, mitä EI päätetty.
+    items_without_decision: []       # pöytäkirjan viimeinen asiapykälä muodostetaan tästä
+    decisions:
+      - id: DEC-000001
+        title: "Päätöksen otsikko"
+        decision_text: >-
+          Täsmällinen päätösteksti. Rahasummat, määräajat, vastuuhenkilöt ja ehdot
+          mukaan — puuttuva ehto on rekisterin yleisin vika.
+        decision_basis: >-
+          Mihin tietoon päätös perustui: aineisto, valmistelija, punnitut vaihtoehdot.
+          Tämä kenttä tekee rekisteristä näytön huolellisuudesta (OYL 1:8 §).
+        conflict_of_interest: none   # none = todettiin ettei esteellisyyksiä | kuvaus, jos oli
+        vote:
+          unanimous: true
+          for: null
+          against: null
+          dissenting_opinions: []    # OYL 6:6 §: eriävä mielipide merkitään
+        category: null               # esim. rahoitus | talous | strategia | henkilosto | hallinto
+        effect_status: in_force      # in_force | executed | superseded | expired | undetermined
+        effect_note: null
+        implementation:
+          responsible: null
+          deadline: null
+          status: null               # pending | done | overdue
+        supersedes: null             # aiempi DEC-tunnus, jos korvaa
+        related_constraints: []      # AUTH-tunnukset, joihin päätös osuu
+        redaction_applied: null      # jos alkuperäisestä jätettiin jotain pois, kirjaa mitä ja miksi
+
+    legacy: null
+      # Tuoduille pöytäkirjoille:
+      # original_minutes_number: "3/2024"
+      # number_assigned_retroactively: true
+      # import_note: "Tuotu skannatusta PDF:stä; sivu 2 osin lukukelvoton"
+
+notable_findings: []
+  # - id: FIND-2026-001
+  #   finding: "..."
+  #   severity: low | medium | high
+  #   interpretation_status: ai_tulkinta
+  #   resolution: null
+
+open_items: []
+
+source_documents:
+  note: >-
+    Kunkin kokouksen alkuperäinen asiakirja arkistossa. Nimi ilman polkua —
+    kansiorakenne voi muuttua, nimi pysyy.
+  documents: []
+    # - minutes_number: PTK-000001
+    #   document: "Hallituksen pöytäkirja 1_2026, 14.5.2026 (pdf, allekirjoitettu)"

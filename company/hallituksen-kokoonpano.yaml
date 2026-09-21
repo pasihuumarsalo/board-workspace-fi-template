@@ -1,0 +1,57 @@
+# Hallituksen kokoonpanorekisteri — TOIMIKAUSITTAIN, ei tilannekuvana.
+#
+# Miksi näin: kysymykseen "kuka oli jäsen 12.3.2022" on voitava vastata, jotta
+# menneiden kokousten päätösvaltaisuus voidaan laskea ja jotta näkee, puuttuiko
+# joku kokouksesta vai eikö hän ollut silloin jäsen. Yksi voimassa oleva lista
+# ei riitä siihen.
+#
+# Jokaisella toimikaudella JA jokaisella jäsenellä on valid_from / valid_until,
+# koska jäsen voi erota kesken kauden.
+schema_version: 1
+record_type: board_composition_register
+
+terms:
+  # Esimerkki — korvaa yhtiön omilla tiedoilla käyttöönotossa.
+  # - term_id: T-0001
+  #   valid_from: 2026-04-12            # yleensä yhtiökokouksen päivä
+  #   valid_until: null                 # null = voimassa; muuten päivä
+  #   selection_basis: "Varsinainen yhtiökokous 12.4.2026"
+  #   source_document: "Yhtiökokouksen pöytäkirja 12.4.2026"   # nimi, ei polku
+  #   status: confirmed                 # provisional | confirmed
+  #   members:
+  #     - person_id: etunimi-sukunimi
+  #       display_name: Etunimi Sukunimi
+  #       board_role: chair             # chair | vice_chair | member | deputy
+  #       valid_from: 2026-04-12
+  #       valid_until: null
+  #       decision_right: true          # varajäsenellä false, ellei toimi jäsenen sijasta
+  #       executive_role: null          # ceo, jos jäsen on myös toimitusjohtaja
+  #       elected_by: "Yhtiökokous 12.4.2026"
+  #       role_elected_by: "Hallituksen järjestäytymiskokous 12.4.2026"   # pj/vpj-rooli
+  []
+
+ceo:
+  # Toimitusjohtaja, myös jos ei ole hallituksen jäsen.
+  person_id: null
+  display_name: null
+  valid_from: null
+  valid_until: null
+  appointed_by: null          # hallituksen päätös, esim. DEC-000012
+
+# Menettelyt, jotka riippuvat kokoonpanosta
+signature_policy:
+  required_signers: all_members_in_term      # all_members_in_term | chair_plus_one
+  includes_absent_members: true
+
+review_policy:
+  required_reviewers: all_members_in_term
+  content_change_starts_new_round: true
+
+secretary:
+  responsible_person_id: null     # kuka vastaa pöytäkirjasta — yleensä puheenjohtaja
+  ai_may_prepare_draft: true
+  ai_is_formal_secretary: false   # agentti ei ole koskaan muodollinen sihteeri
+
+# Historian aukot merkitään tähän, ei täytetä arvaamalla
+known_gaps: []
+  # - "Kokoonpano ennen 2020 ei tiedossa; pöytäkirjat 1–14 tuotu ilman entitled_participants-tietoa"

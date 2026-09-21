@@ -1,0 +1,73 @@
+# Hallituksen vuosikello. Lakisääteinen runko on valmiina; muut asiat lisätään
+# käyttöönotossa (ALOITUS.md, vaihe 7). Kuukausi = milloin asia on käsiteltävä
+# viimeistään; null = sidottu tapahtumaan, ei kuukauteen.
+schema_version: 1
+record_type: annual_cycle
+status: provisional               # provisional | formally_approved (hallitus hyväksynyt)
+fiscal_year_end_month: null       # täytä; lakisääteiset määräajat lasketaan tästä
+
+items:
+  # --- Lakisääteiset (OYL) ---
+  - id: VK-01
+    topic: Tilinpäätöksen ja toimintakertomuksen käsittely ja allekirjoitus
+    basis: "KPL 3:6 § — neljän kuukauden kuluessa tilikauden päättymisestä; OYL 6:2 §"
+    month: null                   # tilikauden päättymiskuukausi + 4
+    decision_required: true
+    recurring: yearly
+  - id: VK-02
+    topic: Varsinaisen yhtiökokouksen valmistelu ja koolle kutsuminen
+    basis: "OYL 5:3 § — kuuden kuukauden kuluessa tilikauden päättymisestä"
+    month: null                   # tilikauden päättymiskuukausi + 5 tai 6
+    decision_required: true
+    recurring: yearly
+  - id: VK-03
+    topic: Voitonjakoesitys yhtiökokoukselle
+    basis: "OYL 13 luku — maksukykyisyysarvio kirjataan"
+    month: null
+    decision_required: true
+    recurring: yearly
+  - id: VK-04
+    topic: Hallituksen järjestäytyminen yhtiökokouksen jälkeen (pj, vpj)
+    basis: "OYL 6:8 §"
+    month: null                   # heti yhtiökokouksen jälkeen
+    decision_required: true
+    recurring: yearly
+
+  # --- Työtilan omat toistuvat asiat ---
+  - id: VK-05
+    topic: Yhtiökokouksen pöytäkirjan läpikäynti — hallitusta koskevat velvoitteet ja valtuutukset
+    basis: "Työtila: company/toimivallan-rajat.yaml päivitetään; kokoonpanorekisteriin uusi toimikausi"
+    month: null                   # yhtiökokouksen jälkeen
+    decision_required: false
+    recurring: yearly
+  - id: VK-06
+    topic: Hallituksen itsearviointi
+    basis: "Keskuskauppakamarin asialuettelo: arviointi ennen hallitusjäsenten valintaa"
+    month: null                   # ennen yhtiökokousta
+    decision_required: false
+    recurring: yearly
+  - id: VK-07
+    topic: Allekirjoitettujen pöytäkirjojen kuittaus rekisteriin
+    basis: "Työtila: decision_text_status odottaa_allekirjoitusta → kopio"
+    month: null
+    decision_required: false
+    recurring: after_each_meeting
+
+  # --- Yhtiön omat, lisätään käyttöönotossa ---
+  # - id: VK-08
+  #   topic: Budjetti ja tavoitteet seuraavalle vuodelle
+  #   month: 11
+  #   decision_required: true
+  #   recurring: yearly
+  # - id: VK-09
+  #   topic: Riskien ja vakuutusten tarkastelu
+  #   month: 9
+  #   decision_required: false
+  #   recurring: yearly
+  # - id: VK-10
+  #   topic: Strategian tarkistus / strategiapäivä
+  #   month: null
+  #   decision_required: mahdollinen
+  #   recurring: yearly
+
+open_items: []
