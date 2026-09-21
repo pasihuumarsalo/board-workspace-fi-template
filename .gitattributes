@@ -6,3 +6,8 @@
 *.yaml text eol=lf
 *.yml text eol=lf
 *.py text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+# Koukut ajetaan sh:lla myös Windowsin Git Bashissa — CRLF rikkoisi ne
+.githooks/* text eol=lf
