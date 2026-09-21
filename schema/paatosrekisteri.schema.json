@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "board-workspace-fi/paatosrekisteri.schema.json",
+  "title": "Päätösrekisterin tilikausitiedosto (decisions/<vuosi>.yaml)",
+  "type": "object",
+  "required": ["schema_version", "record_type", "fiscal_year", "meetings"],
+  "properties": {
+    "schema_version": { "const": 2 },
+    "record_type": { "const": "board_decision_register" },
+    "fiscal_year": { "type": "string", "pattern": "^[0-9]{4}(-[0-9]{4})?$" },
+    "minutes_range": { "type": ["string", "null"] },
+    "period_open": { "type": "boolean" },
+    "record_authority": { "type": "object" },
+    "meetings": { "type": "array", "items": { "$ref": "#/$defs/meeting" } },
+    "notable_findings": { "type": ["array", "null"], "items": { "$ref": "#/$defs/finding" } },
+    "open_items": { "type": ["array", "null"] },
+    "source_documents": {
+      "type": ["object", "null"],
+      "properties": {
+        "note": { "type": ["string", "null"] },
+        "documents": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "required": ["minutes_number", "document"],
+            "properties": {
+              "minutes_number": { "$ref": "#/$defs/tunnus" },
+              "document": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "tunnus": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*-[0-9]{6}$" },
+    "person_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "person_ids": { "type": "array", "items": { "$ref": "#/$defs/person_id" } },
+    "date": { "type": "string", "format": "date" },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}(:[0-9]{2})?$" },
+    "nullable_date": { "anyOf": [ { "$ref": "#/$defs/date" }, { "type": "null" } ] },
+    "nullable_timestamp": { "anyOf": [ { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] },
+
+    "meeting": {
+      "type": "object",
+      "required": ["minutes_number", "decision_date", "decision_method", "roles", "participants",
+                   "entitled_participants", "decision_text_status", "decisions"],
+      "properties": {
+        "minutes_number": { "$ref": "#/$defs/tunnus" },
+        "decision_date": { "$ref": "#/$defs/date" },
+        "title": { "type": ["string", "null"] },
+        "place": { "type": ["string", "null"] },
+        "decision_method": { "enum": ["meeting", "without_meeting"] },
+        "roles": {
+          "type": "object",
+          "required": ["meeting_chair_person_id"],
+          "properties": {
+            "meeting_chair_person_id": { "$ref": "#/$defs/person_id" },
+            "secretary_person_id": { "anyOf": [ { "$ref": "#/$defs/person_id" }, { "type": "null" } ] },
+            "ceo_participation": { "enum": ["present", "absent", "partial", "not_applicable", null] }
+          }
+        },
+        "participants": { "$ref": "#/$defs/person_ids" },
+        "entitled_participants": { "$ref": "#/$defs/person_ids" },
+        "deputy_substitutions": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "required": ["deputy_person_id", "for_person_id"],
+            "properties": {
+              "deputy_person_id": { "$ref": "#/$defs/person_id" },
+              "for_person_id": { "$ref": "#/$defs/person_id" }
+            }
+          }
+        },
+        "invited_participants": {
+          "type": ["array", "null"],
+          "items": {
+            "anyOf": [
+              { "type": "string" },
+              {
+                "type": "object",
+                "properties": {
+                  "display_name": { "type": ["string", "null"] },
+                  "role": { "type": ["string", "null"] },
+                  "person_id": { "anyOf": [ { "$ref": "#/$defs/person_id" }, { "type": "null" } ] },
+                  "items": { "type": ["string", "null"] }
+                }
+              }
+            ]
+          }
+        },
+        "notice": {
+          "type": ["object", "null"],
+          "properties": {
+            "sent_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] },
+            "sent_by": { "anyOf": [ { "$ref": "#/$defs/person_id" }, { "type": "null" } ] },
+            "channel": { "type": ["string", "null"] },
+            "invited_person_ids": { "anyOf": [ { "$ref": "#/$defs/person_ids" }, { "type": "null" } ] },
+            "deputy_invited_for": { "anyOf": [ { "$ref": "#/$defs/person_ids" }, { "type": "null" } ] },
+            "materials_sent_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] },
+            "participation_opportunity_confirmed": { "type": ["boolean", "null"] }
+          }
+        },
+        "quorum": {
+          "type": ["object", "null"],
+          "properties": {
+            "basis": { "type": ["string", "null"] },
+            "entitled_count": { "type": ["integer", "null"] },
+            "present_count": { "type": ["integer", "null"] },
+            "is_quorate": { "type": ["boolean", "null"] },
+            "derived": { "type": ["boolean", "null"] }
+          }
+        },
+        "session": {
+          "type": ["object", "null"],
+          "properties": {
+            "opened_at": { "$ref": "#/$defs/nullable_timestamp" },
+            "closed_at": { "$ref": "#/$defs/nullable_timestamp" }
+          }
+        },
+        "without_meeting": {
+          "type": ["object", "null"],
+          "properties": {
+            "proposal_sent_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] },
+            "response_deadline": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] },
+            "verification_method": { "type": ["string", "null"] },
+            "responses": {
+              "type": ["array", "null"],
+              "items": {
+                "type": "object",
+                "required": ["person_id", "position"],
+                "properties": {
+                  "person_id": { "$ref": "#/$defs/person_id" },
+                  "position": { "enum": ["for", "against", "abstain", "no_response"] },
+                  "responded_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] }
+                }
+              }
+            }
+          }
+        },
+        "wording_confirmed_by_chair": {
+          "type": ["object", "null"],
+          "properties": {
+            "confirmed": { "type": ["boolean", "null"] },
+            "person_id": { "anyOf": [ { "$ref": "#/$defs/person_id" }, { "type": "null" } ] },
+            "confirmed_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] }
+          }
+        },
+        "signatures": {
+          "type": ["object", "null"],
+          "properties": {
+            "policy": { "enum": ["chair_plus_one", "all_members_in_term", "all_present_members", null] },
+            "required_signer_person_ids": { "anyOf": [ { "$ref": "#/$defs/person_ids" }, { "type": "null" } ] },
+            "signed": {
+              "type": ["array", "null"],
+              "items": {
+                "type": "object",
+                "required": ["person_id"],
+                "properties": {
+                  "person_id": { "$ref": "#/$defs/person_id" },
+                  "signed_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] },
+                  "method": { "type": ["string", "null"] }
+                }
+              }
+            }
+          }
+        },
+        "reviewed_by": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "required": ["person_id"],
+            "properties": {
+              "person_id": { "$ref": "#/$defs/person_id" },
+              "reviewed_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] }
+            }
+          }
+        },
+        "decision_text_status": { "enum": ["kopio", "kopio_kuvasta", "odottaa_allekirjoitusta"] },
+        "interpretation_status": { "enum": ["ai_tulkinta", "ihmisen_vahvistama", null] },
+        "meeting_note": { "type": ["string", "null"] },
+        "items_without_decision": { "type": ["array", "null"], "items": { "type": "string" } },
+        "decisions": { "type": "array", "items": { "$ref": "#/$defs/decision" } },
+        "legacy": {
+          "type": ["object", "null"],
+          "properties": {
+            "original_minutes_number": { "type": ["string", "null"] },
+            "number_assigned_retroactively": { "type": ["boolean", "null"] },
+            "import_note": { "type": ["string", "null"] }
+          }
+        },
+        "import_metadata": { "type": ["object", "null"] }
+      }
+    },
+
+    "decision": {
+      "type": "object",
+      "required": ["id", "title", "decision_text", "conflict_of_interest", "effect_status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/tunnus" },
+        "title": { "type": "string", "minLength": 1 },
+        "proposal": { "type": ["string", "null"] },
+        "decision_text": { "type": "string", "minLength": 1 },
+        "decision_basis": { "type": ["string", "null"] },
+        "conflict_of_interest": {
+          "anyOf": [
+            { "const": "none" },
+            {
+              "type": "object",
+              "required": ["status"],
+              "properties": {
+                "status": { "enum": ["none", "declared"] },
+                "disqualified_person_ids": { "anyOf": [ { "$ref": "#/$defs/person_ids" }, { "type": "null" } ] },
+                "note": { "type": ["string", "null"] },
+                "left_room": { "type": ["boolean", "null"] }
+              }
+            }
+          ]
+        },
+        "decision_quorum": {
+          "type": ["object", "null"],
+          "properties": {
+            "entitled_count": { "type": ["integer", "null"] },
+            "disqualified_person_ids": { "anyOf": [ { "$ref": "#/$defs/person_ids" }, { "type": "null" } ] },
+            "eligible_count": { "type": ["integer", "null"] },
+            "participating_person_ids": { "anyOf": [ { "$ref": "#/$defs/person_ids" }, { "type": "null" } ] },
+            "participating_count": { "type": ["integer", "null"] },
+            "is_quorate": { "type": ["boolean", "null"] },
+            "basis": { "type": ["string", "null"] },
+            "derived": { "type": ["boolean", "null"] }
+          }
+        },
+        "vote": {
+          "type": ["object", "null"],
+          "required": ["unanimous"],
+          "properties": {
+            "unanimous": { "type": "boolean" },
+            "for": { "type": ["integer", "null"] },
+            "against": { "type": ["integer", "null"] },
+            "abstained": { "type": ["integer", "null"] },
+            "chair_casting_vote": { "type": ["boolean", "null"] },
+            "votes": {
+              "type": ["array", "null"],
+              "items": {
+                "type": "object",
+                "required": ["person_id", "vote"],
+                "properties": {
+                  "person_id": { "$ref": "#/$defs/person_id" },
+                  "vote": { "enum": ["for", "against", "abstain"] }
+                }
+              }
+            },
+            "dissenting_opinions": {
+              "type": ["array", "null"],
+              "items": {
+                "type": "object",
+                "required": ["person_id", "text"],
+                "properties": {
+                  "person_id": { "$ref": "#/$defs/person_id" },
+                  "text": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        },
+        "category": { "type": ["string", "null"] },
+        "effect_status": { "enum": ["in_force", "executed", "superseded", "expired", "undetermined"] },
+        "effect_note": { "type": ["string", "null"] },
+        "interpretation": {
+          "type": ["object", "null"],
+          "required": ["status"],
+          "properties": {
+            "status": { "enum": ["ai_tulkinta", "ihmisen_vahvistama"] },
+            "confirmed_by": { "anyOf": [ { "$ref": "#/$defs/person_id" }, { "type": "null" } ] },
+            "confirmed_at": { "anyOf": [ { "$ref": "#/$defs/date" }, { "$ref": "#/$defs/timestamp" }, { "type": "null" } ] },
+            "note": { "type": ["string", "null"] }
+          }
+        },
+        "implementation": {
+          "type": ["object", "null"],
+          "properties": {
+            "responsible": { "type": ["string", "null"] },
+            "deadline": { "$ref": "#/$defs/nullable_date" },
+            "status": { "enum": ["pending", "done", "overdue", null] }
+          }
+        },
+        "supersedes": { "anyOf": [ { "$ref": "#/$defs/tunnus" }, { "type": "null" } ] },
+        "related_constraints": { "type": ["array", "null"], "items": { "type": "string" } },
+        "redaction_applied": { "type": ["string", "null"] }
+      }
+    },
+
+    "finding": {
+      "type": "object",
+      "required": ["id", "finding"],
+      "properties": {
+        "id": { "type": "string" },
+        "finding": { "type": "string" },
+        "severity": { "enum": ["low", "medium", "high", null] },
+        "interpretation_status": { "enum": ["ai_tulkinta", "ihmisen_vahvistama", null] },
+        "resolution": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "board-workspace-fi/toimivallan-rajat.schema.json",
+  "title": "Toimivallan rajat (company/toimivallan-rajat.yaml)",
+  "type": "object",
+  "required": ["schema_version", "record_type", "constraints"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "record_type": { "const": "authority_and_constraints" },
+    "status": { "enum": ["provisional", "confirmed"] },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "source_type", "source_reference", "constraint"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "source_type": { "enum": ["law", "articles_of_association", "general_meeting", "shareholders_agreement", "board_decision"] },
+          "source_reference": { "type": "string", "minLength": 1 },
+          "topic": { "type": ["string", "null"] },
+          "constraint": { "type": "string", "minLength": 1 },
+          "effect_on_board": { "type": ["string", "null"] },
+          "valid_from": { "anyOf": [ { "type": "string", "format": "date" }, { "type": "null" } ] },
+          "valid_until": { "anyOf": [ { "type": "string", "format": "date" }, { "type": "null" } ] },
+          "status": { "enum": ["provisional", "confirmed", "superseded", null] }
+        }
+      }
+    },
+    "authorizations": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "required": ["id", "granted_by", "topic"],
+        "properties": {
+          "id": { "type": "string" },
+          "granted_by": { "type": "string" },
+          "topic": { "type": "string" },
+          "scope": { "type": ["string", "null"] },
+          "valid_until": { "anyOf": [ { "type": "string", "format": "date" }, { "type": "null" } ] },
+          "used": { "type": ["boolean", "null"] },
+          "status": { "enum": ["provisional", "confirmed", "superseded", null] }
+        }
+      }
+    },
+    "source_documents": { "type": ["object", "null"] }
+  }
+}

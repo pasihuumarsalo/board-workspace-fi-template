@@ -1,0 +1,24 @@
+# Samat tarkistukset kuin paikallisessa pre-commit-koukussa, ajettuna GitHubissa
+# jokaiselle pushille ja pull requestille. Yksityisessä repossa CI vaatii GitHubin
+# ilmaisen Actions-kiintiön riittämisen; haaran suojaus (branch protection) vaatii
+# yksityisillä repoilla maksullisen tason — jos se ei ole käytössä, tämä ajo on
+# ilmoitus, ei portti. Kirjaa tilanne käyttöönotossa (ALOITUS.md, vaihe 9).
+name: Tarkistukset
+on:
+  push:
+  pull_request:
+jobs:
+  tarkistukset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Sisältötarkistus (henkilötunnukset, salaisuudet, Word-tiedostot)
+        run: python scripts/tarkista-sisalto.py
+      - name: Rakennetarkistus (skeema ja liiketoimintasäännöt)
+        run: python scripts/validoi-tyotila.py
+      - name: Testit
+        run: python -m unittest discover -s tests -v

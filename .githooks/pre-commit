@@ -1,0 +1,9 @@
+#!/bin/sh
+# Ajetaan ennen jokaista committia. Käyttöönotto kerran per klooni:
+#   git config core.hooksPath .githooks
+# Kaksi tarkistusta: (1) sisältö — henkilötunnukset, salaisuudet, kielletyt
+# merkkijonot, myös Word-tiedostoista; (2) rakenne — rekisterin skeema ja
+# liiketoimintasäännöt. Estävä virhe pysäyttää commitin.
+set -e
+python scripts/tarkista-sisalto.py --staged
+python scripts/validoi-tyotila.py --hiljainen

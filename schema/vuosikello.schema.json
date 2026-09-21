@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "board-workspace-fi/vuosikello.schema.json",
+  "title": "Vuosikello (annual-cycle/vuosikello.yaml)",
+  "type": "object",
+  "required": ["schema_version", "record_type", "items"],
+  "properties": {
+    "schema_version": { "const": 2 },
+    "record_type": { "const": "annual_cycle" },
+    "status": { "enum": ["provisional", "confirmed", "formally_approved"] },
+    "fiscal_year_end_month": { "type": ["integer", "null"], "minimum": 1, "maximum": 12 },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+    "optional_catalog": { "type": ["array", "null"], "items": { "$ref": "#/$defs/item" } },
+    "open_items": { "type": ["array", "null"] }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "required": ["id", "topic"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^VK-[A-Z0-9-]+$" },
+        "topic": { "type": "string", "minLength": 1 },
+        "basis": { "type": ["string", "null"] },
+        "month": { "type": ["integer", "null"], "minimum": 1, "maximum": 12 },
+        "decision_required": { "enum": [true, false, "mahdollinen", null] },
+        "recurring": { "enum": ["yearly", "quarterly", "monthly", "after_each_meeting", "as_needed", null] },
+        "adopted": { "type": ["boolean", "null"] },
+        "note": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -1,75 +1,252 @@
-# Päätösrekisterin tilikausitiedoston malli. Kopioi nimelle <vuosi>.yaml ja
-# poista esimerkkisisältö. Kaikki kentät on kuvattu governance/03:ssa.
-schema_version: 1
+# Päätösrekisterin tilikausitiedoston malli, skeema 2. Kopioi nimelle <vuosi>.yaml
+# ja korvaa esimerkkisisältö. Kentät on kuvattu governance/03:ssa, koneellinen
+# skeema on schema/paatosrekisteri.schema.json ja tarkistus ajetaan
+#   python scripts/validoi-tyotila.py
+#
+# Henkilöt viitataan person_id-tunnuksella, joka on kokoonpanorekisterissä
+# (company/hallituksen-kokoonpano.yaml). Nimi tulostuu pöytäkirjaan sieltä.
+# Tässä mallissa esiintyvät henkilöt ovat keksittyjä.
+schema_version: 2
 record_type: board_decision_register
-fiscal_year: "2026"                 # tilikausi
+fiscal_year: "2026"
 minutes_range: null                 # esim. "PTK-000001 – PTK-000009", päivitetään
 period_open: true                   # true kunnes tilikausi on päättynyt ja pöytäkirjat allekirjoitettu
 
 record_authority:
-  # Mistä tekstit ovat peräisin ja missä auktoriteetti on.
   authoritative_source: >-
     Allekirjoitettu pöytäkirja yhtiön arkistossa (company/yhtio.yaml → minutes_archive).
     Ristiriitatilanteessa alkuperäinen ratkaisee, ei tämä rekisteri.
   interpretation_note: >-
-    Kentät effect_status, effect_note, *_note ja notable_findings ovat agentin tulkintoja.
-    Ne ovat ai_tulkinta-tilassa, kunnes ihminen vahvistaa ne.
+    Kentät effect_status, effect_note ja notable_findings ovat agentin tulkintoja.
+    Jokaisen päätöksen interpretation-lohko kertoo, onko sen tulkinta ihmisen vahvistama.
+  derived_fields_note: >-
+    quorum ja decision_quorum lasketaan listoista. Jos ne on kirjoitettu tähän,
+    validointi vertaa ne laskettuun ja ristiriita on virhe.
 
 meetings:
+  # ---------------------------------------------------------------- kokous
   - minutes_number: PTK-000001
-    decision_date: 2026-05-14        # päätöspäivä; monipäiväisessä viimeinen päivä
+    decision_date: 2026-05-14         # päätöspäivä; monipäiväisessä kokouksessa päättämispäivä
     title: "Hallituksen kokous"
-    place: "Yhtiön toimisto, [osoite]"   # tai "Etäkokous (Teams)"
-    decision_method: meeting         # meeting | without_meeting
-    participants: []                 # läsnä olleet jäsenet, display_name
-    entitled_participants: []        # toimikauden jäsenet kokouspäivänä (company/hallituksen-kokoonpano.yaml)
-    invited_participants: []         # asiantuntijat, esittelijät — eivät jäseniä
-    quorum:
-      basis: "OYL 6:3 § — yli puolet jäsenistä läsnä"   # tai yhtiöjärjestyksen kohta, jos tiukempi
-      entitled_count: 0
-      present_count: 0
-      is_quorate: null
-      derived: true                  # laskettu listoista, ei kopioitu pöytäkirjasta
+    place: "Yhtiön toimisto, Esimerkkikatu 1, Helsinki"   # tai "Etäkokous (Teams)"
+    decision_method: meeting          # meeting | without_meeting
+
+    roles:                            # roolit TÄSSÄ kokouksessa — voivat poiketa pysyvästä roolista
+      meeting_chair_person_id: matti-meikalainen
+      secretary_person_id: null       # null = ei erillistä sihteeriä; pöytäkirjasta vastaa puheenjohtaja
+      ceo_participation: present      # present | absent | partial | not_applicable
+
+    participants:                     # läsnä olleet päätösoikeudelliset jäsenet
+      - matti-meikalainen
+      - maija-mallikas
+    deputy_substitutions:             # varajäsen varsinaisen jäsenen sijasta
+      - deputy_person_id: varpu-varajasen
+        for_person_id: kalle-kokeilija
+    entitled_participants:            # toimikauden jäsenet kokouspäivänä (kokoonpanorekisteristä)
+      - matti-meikalainen
+      - maija-mallikas
+      - kalle-kokeilija
+    invited_participants:             # eivät jäseniä; nimi tai pelkkä rooli
+      - display_name: null
+        role: "tilintarkastaja"
+        person_id: null
+        items: "3 §"                  # jos vain osan ajasta
+
+    notice:                           # koollekutsuminen — OYL 6:3 §: tilaisuus osallistua
+      sent_at: 2026-05-06
+      sent_by: matti-meikalainen
+      channel: "sähköposti"
+      invited_person_ids: [matti-meikalainen, maija-mallikas, kalle-kokeilija]
+      deputy_invited_for: [kalle-kokeilija]
+      materials_sent_at: 2026-05-09
+      participation_opportunity_confirmed: true
+
+    quorum:                           # LASKETAAN — kirjoitettu arvo tarkistetaan laskettua vasten
+      basis: "OYL 6:3 § — yli puolet jäsenistä"
+      entitled_count: 3
+      present_count: 3                # 2 jäsentä + 1 sijaisena toiminut varajäsen
+      is_quorate: true
+      derived: true
+
     session:
       opened_at: "2026-05-14 09:00"
       closed_at: "2026-05-14 11:30"
-    signatures: []                   # täytetään kun allekirjoitettu
+    without_meeting: null
+
+    wording_confirmed_by_chair:       # --valmis edellyttää confirmed: true
+      confirmed: false
+      person_id: null
+      confirmed_at: null
+    signatures:
+      policy: null                    # null = kokoonpanorekisterin signature_policy
+      required_signer_person_ids: [matti-meikalainen, maija-mallikas]
+      signed: []                      # - {person_id: ..., signed_at: 2026-05-20, method: "sähköinen allekirjoitus"}
+    reviewed_by: []                   # tarkastus on eri asia kuin allekirjoitus: - {person_id: ..., reviewed_at: ...}
+
     decision_text_status: odottaa_allekirjoitusta   # kopio | kopio_kuvasta | odottaa_allekirjoitusta
-    interpretation_status: ai_tulkinta              # ai_tulkinta | ihmisen_vahvistama
+    interpretation_status: ai_tulkinta              # kokoustason tulkinnat (meeting_note); päätöksillä oma lohko
     meeting_note: >-
       Vapaa kuvaus kokouksen kulusta. Tähän myös se, mitä EI päätetty.
-    items_without_decision: []       # pöytäkirjan viimeinen asiapykälä muodostetaan tästä
+    items_without_decision:           # pöytäkirjan viimeinen asiapykälä muodostetaan tästä
+      - "Investointiehdotus X siirrettiin seuraavaan kokoukseen lisäselvitystä varten."
+
     decisions:
       - id: DEC-000001
         title: "Päätöksen otsikko"
+        proposal: null                # päätösehdotus; pakollinen päätöksessä ilman kokousta
         decision_text: >-
           Täsmällinen päätösteksti. Rahasummat, määräajat, vastuuhenkilöt ja ehdot
           mukaan — puuttuva ehto on rekisterin yleisin vika.
         decision_basis: >-
           Mihin tietoon päätös perustui: aineisto, valmistelija, punnitut vaihtoehdot.
           Tämä kenttä tekee rekisteristä näytön huolellisuudesta (OYL 1:8 §).
-        conflict_of_interest: none   # none = todettiin ettei esteellisyyksiä | kuvaus, jos oli
+        conflict_of_interest: none    # none = todettiin ettei ollut. Tyhjä = ei kysytty. Tai objekti, ks. DEC-000002
+        decision_quorum: null         # lasketaan; voi kirjoittaa näkyviin, jolloin tarkistetaan
         vote:
           unanimous: true
           for: null
           against: null
-          dissenting_opinions: []    # OYL 6:6 §: eriävä mielipide merkitään
-        category: null               # esim. rahoitus | talous | strategia | henkilosto | hallinto
-        effect_status: in_force      # in_force | executed | superseded | expired | undetermined
+          abstained: null
+          chair_casting_vote: false
+          votes: []                   # - {person_id: ..., vote: for | against | abstain}
+          dissenting_opinions: []     # OYL 6:6 §: - {person_id: ..., text: "..."}
+        category: null                # esim. rahoitus | talous | strategia | henkilosto | hallinto
+        effect_status: in_force       # in_force | executed | superseded | expired | undetermined
         effect_note: null
+        interpretation:               # PÄÄTÖSKOHTAINEN: effect_status ja yhteydet ovat tulkintaa
+          status: ai_tulkinta         # ai_tulkinta | ihmisen_vahvistama
+          confirmed_by: null
+          confirmed_at: null
+          note: null
         implementation:
           responsible: null
           deadline: null
-          status: null               # pending | done | overdue
-        supersedes: null             # aiempi DEC-tunnus, jos korvaa
-        related_constraints: []      # AUTH-tunnukset, joihin päätös osuu
-        redaction_applied: null      # jos alkuperäisestä jätettiin jotain pois, kirjaa mitä ja miksi
+          status: null                # pending | done | overdue
+        supersedes: null              # aiempi DEC-tunnus, jos korvaa
+        related_constraints: []       # AUTH-tunnukset, joihin päätös osuu
+        redaction_applied: null       # jos alkuperäisestä jätettiin jotain pois, kirjaa mitä ja miksi
+
+      - id: DEC-000002
+        title: "Esimerkki: esteellisyys ja äänestys"
+        proposal: null
+        decision_text: >-
+          Hyväksyttiin sopimus yhtiön ja Yritys Oy:n välillä liitteen mukaisin ehdoin.
+        decision_basis: "Toimitusjohtajan esitys 9.5.2026; vertailtu kahta tarjousta."
+        conflict_of_interest:         # täysi muoto: kuka, poistuiko, miksi
+          status: declared
+          disqualified_person_ids: [maija-mallikas]
+          left_room: true
+          note: "Vastapuolen hallituksen jäsen (OYL 6:4 §)."
+        decision_quorum:              # osallistui 2 (pj + sijainen), esteellisiä 1, jäseniä 3 → 2/3 > ½
+          entitled_count: 3
+          disqualified_person_ids: [maija-mallikas]
+          eligible_count: 2
+          participating_person_ids: [matti-meikalainen, varpu-varajasen]
+          participating_count: 2
+          is_quorate: true
+          basis: "OYL 6:3 § — yli puolet jäsenistä; esteellinen ei osallistu (OYL 6:4 §)"
+          derived: true
+        vote:
+          unanimous: false
+          for: 1
+          against: 1
+          abstained: 0
+          chair_casting_vote: true    # äänet tasan → puheenjohtajan ääni ratkaisee (OYL 6:3 §)
+          votes:
+            - {person_id: matti-meikalainen, vote: for}
+            - {person_id: varpu-varajasen, vote: against}
+          dissenting_opinions:
+            - person_id: varpu-varajasen
+              text: "Katson, että sopimuksen hinta ylittää markkinatason."
+        category: hallinto
+        effect_status: in_force
+        effect_note: null
+        interpretation:
+          status: ai_tulkinta
+          confirmed_by: null
+          confirmed_at: null
+          note: null
+        implementation:
+          responsible: "toimitusjohtaja"
+          deadline: 2026-06-30
+          status: pending
+        supersedes: null
+        related_constraints: []
+        redaction_applied: null
 
     legacy: null
       # Tuoduille pöytäkirjoille:
       # original_minutes_number: "3/2024"
       # number_assigned_retroactively: true
       # import_note: "Tuotu skannatusta PDF:stä; sivu 2 osin lukukelvoton"
+
+  # ------------------------------------------------- päätös ilman kokousta (OYL 6:3 §)
+  # Sama juokseva PTK-sarja kuin kokouksilla: laki edellyttää, että päätös kirjataan,
+  # allekirjoitetaan, numeroidaan ja säilytetään kuten kokouksen pöytäkirja.
+  - minutes_number: PTK-000002
+    decision_date: 2026-06-02
+    title: "Hallituksen päätös ilman kokousta"
+    place: null                       # ei kokouspaikkaa
+    decision_method: without_meeting
+    roles:
+      meeting_chair_person_id: matti-meikalainen   # hallituksen puheenjohtaja vastaa menettelystä
+      secretary_person_id: null
+      ceo_participation: not_applicable
+    participants: [matti-meikalainen, maija-mallikas, kalle-kokeilija]   # kannan antaneet
+    deputy_substitutions: []
+    entitled_participants: [matti-meikalainen, maija-mallikas, kalle-kokeilija]
+    invited_participants: []
+    notice:
+      sent_at: "2026-05-29 14:00"
+      sent_by: matti-meikalainen
+      channel: "sähköposti"
+      invited_person_ids: [matti-meikalainen, maija-mallikas, kalle-kokeilija]
+      deputy_invited_for: []
+      materials_sent_at: "2026-05-29 14:00"
+      participation_opportunity_confirmed: true    # jokaiselle jäsenelle varattiin tilaisuus — pakollinen
+    quorum:
+      basis: "OYL 6:3 § — yli puolet jäsenistä"
+      entitled_count: 3
+      present_count: 3
+      is_quorate: true
+      derived: true
+    session: null                     # EI avaus- eikä päättämisaikaa
+    without_meeting:
+      proposal_sent_at: "2026-05-29 14:00"
+      response_deadline: "2026-06-02 16:00"
+      verification_method: "sähköinen allekirjoitus"   # tai "sähköpostivahvistukset arkistoitu pöytäkirjan liitteenä"
+      responses:                      # jokaisesta jäsenestä rivi, myös vastaamatta jättäneestä
+        - {person_id: matti-meikalainen, position: for, responded_at: "2026-05-29 15:10"}
+        - {person_id: maija-mallikas, position: for, responded_at: "2026-05-30 09:02"}
+        - {person_id: kalle-kokeilija, position: for, responded_at: "2026-06-01 18:45"}
+    wording_confirmed_by_chair: {confirmed: false, person_id: null, confirmed_at: null}
+    signatures:
+      policy: null
+      required_signer_person_ids: [matti-meikalainen, kalle-kokeilija]
+      signed: []
+    reviewed_by: []
+    decision_text_status: odottaa_allekirjoitusta
+    interpretation_status: ai_tulkinta
+    meeting_note: null
+    items_without_decision: []
+    decisions:
+      - id: DEC-000003
+        title: "Pankkitilin avaaminen"
+        proposal: "Avataan yhtiölle käyttötili Pankki X:ssä; käyttöoikeus toimitusjohtajalle."
+        decision_text: "Päätettiin avata yhtiölle käyttötili Pankki X:ssä. Tilin käyttöoikeus annetaan toimitusjohtajalle."
+        decision_basis: "Toimitusjohtajan esitys 29.5.2026; kahden pankin hinnastovertailu."
+        conflict_of_interest: none
+        decision_quorum: null
+        vote: {unanimous: true, for: 3, against: 0, abstained: 0, chair_casting_vote: false, votes: [], dissenting_opinions: []}
+        category: talous
+        effect_status: in_force
+        effect_note: null
+        interpretation: {status: ai_tulkinta, confirmed_by: null, confirmed_at: null, note: null}
+        implementation: {responsible: "toimitusjohtaja", deadline: 2026-06-30, status: pending}
+        supersedes: null
+        related_constraints: []
+        redaction_applied: null
+    legacy: null
 
 notable_findings: []
   # - id: FIND-2026-001
@@ -86,4 +263,4 @@ source_documents:
     kansiorakenne voi muuttua, nimi pysyy.
   documents: []
     # - minutes_number: PTK-000001
-    #   document: "Hallituksen pöytäkirja 1_2026, 14.5.2026 (pdf, allekirjoitettu)"
+    #   document: "Hallituksen pöytäkirja 1, 14.5.2026 (pdf, allekirjoitettu)"

@@ -20,4 +20,6 @@ Luonnokseen kirjataan myös **mitä ei päätetty** — siirretyt, käsittelemä
 
 ## Menettelykehys kerätään kokouksessa
 
-Kokousluonnos kysyy heti alussa: toimikauden jäsenet, läsnä olevat jäsenet, kutsutut asiantuntijat, avausaika. Lopussa päättämisaika. Nämä tarvitaan pöytäkirjaan, ja niiden rekonstruoiminen jälkikäteen on epäluotettavaa.
+Kokousluonnos kysyy heti alussa: kokouksen puheenjohtaja ja sihteeri, toimikauden jäsenet, läsnä olevat jäsenet, sijaisina toimivat varajäsenet (kenen sijasta), toimitusjohtajan osallistuminen, kutsutut asiantuntijat, milloin kutsu ja aineisto lähetettiin, avausaika. Lopussa päättämisaika. Nämä tarvitaan pöytäkirjaan ja päätösvaltaisuuden laskentaan, ja niiden rekonstruoiminen jälkikäteen on epäluotettavaa.
+
+Jokaisen päätettävän asian kohdalla kysytään erikseen: **esteellisyys** (kuka, poistuiko käsittelyn ajaksi — vaikuttaa asian päätösvaltaisuuteen) ja **äänestys** (yksimielinen vai äänet puolesta/vastaan/tyhjää, eriävät mielipiteet sanatarkasti). Näitä ei kysytä kokouksen lopussa yhteisesti, koska ne ovat asiakohtaisia.

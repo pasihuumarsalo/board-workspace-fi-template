@@ -32,7 +32,11 @@ Kuvattu [`AGENTS.md`](../AGENTS.md):ssä. Lyhyesti: **taso 1** agentti saa kirja
 
 ## Kaksi tilakenttää päätöksillä
 
-`decision_text_status` kertoo, onko päätösteksti kopio allekirjoitetusta asiakirjasta. `interpretation_status` kertoo, onko agentin päätelmä ihmisen vahvistama. Ne ovat eri asioita: teksti voi olla täydellinen kopio ja sen voimassaoloarvio silti vahvistamaton. Täysi kuvaus: [`03`](03-paatokset-ja-poytakirja.md).
+`decision_text_status` (kokoustasolla) kertoo, onko päätösteksti kopio allekirjoitetusta asiakirjasta. `interpretation` (**päätöskohtainen lohko**: `status`, `confirmed_by`, `confirmed_at`) kertoo, onko agentin päätelmä päätöksen voimassaolosta ja yhteyksistä ihmisen vahvistama. Ne ovat eri asioita: teksti voi olla täydellinen kopio ja sen voimassaoloarvio silti vahvistamaton — ja saman kokouksen päätöksistä yksi voi olla vahvistettu ja toinen ei. Täysi kuvaus: [`03`](03-paatokset-ja-poytakirja.md).
+
+## Johdettu tieto lasketaan, kirjoitettu tieto tarkistetaan
+
+Päätösvaltaisuus, seuraava tunnus, poissaolijat ja allekirjoittajien vähimmäismäärä johdetaan rekisteristä (`scripts/tyotila.py`). Jos sama tieto on kirjoitettu rekisteriin käsin, validointi vertaa sen johdettuun ja ristiriita on virhe, ei näkökulmaero. Henkilöt viitataan `person_id`-tunnuksella kokoonpanorekisteriin; nimi tulostuu asiakirjaan sieltä.
 
 ## Yksi asiakirja on aina alkuperäinen
 

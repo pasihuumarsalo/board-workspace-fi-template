@@ -22,6 +22,23 @@ id_prefix:
   minutes: "PTK-"
   decision: "DEC-"
 
+# Käyttöoikeudet, varmuuskopiointi ja arkistointi (governance/07). Täytetään
+# käyttöönotossa (ALOITUS.md, vaihe 9). null = ei ratkaistu — ei oletus.
+access_and_continuity:
+  repository_private: null            # true — hallituksen aineisto ei ole julkista
+  mfa_required: null                  # kaksivaiheinen tunnistautuminen tai passkey kaikilta
+  write_access_person_ids: []         # kenellä on kirjoitusoikeus — yleensä yksi
+  access_review_on_composition_change: null   # true = oikeudet tarkistetaan kokoonpanon muuttuessa
+  ai_service:
+    name: null                        # mikä tekoälypalvelu lukee tätä repoa
+    processing_agreement_checked: null   # DPA / käsittelijäsopimus tarkistettu
+    training_use_excluded: null       # palvelu ei käytä sisältöä mallien koulutukseen
+  backup:
+    method: null                      # esim. "GitHub + kuukausittainen klooni yhtiön levylle"
+    last_restore_test: null           # päivä, jolloin palautus viimeksi kokeiltiin
+  branch_protection: null             # true | false | "ei käytettävissä tällä GitHub-tasolla"
+  signed_minutes_archive_separate: null   # true = allekirjoitetut alkuperäiset ovat erillisessä arkistossa (minutes_archive)
+
 onboarding:
   completed_at: null
   completed_by: null

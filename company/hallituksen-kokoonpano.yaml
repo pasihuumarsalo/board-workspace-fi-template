@@ -6,45 +6,68 @@
 # ei riitä siihen.
 #
 # Jokaisella toimikaudella JA jokaisella jäsenellä on valid_from / valid_until,
-# koska jäsen voi erota kesken kauden.
-schema_version: 1
+# koska jäsen voi erota kesken kauden. person_id on se tunnus, jolla päätös-
+# rekisteri viittaa henkilöön — nimi tulostuu asiakirjoihin täältä.
+#
+# Koneellinen skeema: schema/kokoonpano.schema.json. Tarkistus: scripts/validoi-tyotila.py
+schema_version: 2
 record_type: board_composition_register
 
 terms:
   # Esimerkki — korvaa yhtiön omilla tiedoilla käyttöönotossa.
   # - term_id: T-0001
   #   valid_from: 2026-04-12            # yleensä yhtiökokouksen päivä
-  #   valid_until: null                 # null = voimassa; muuten päivä
+  #   valid_until: null                 # null = voimassa; muuten päivä. Vain nykyinen kausi saa olla avoin
   #   selection_basis: "Varsinainen yhtiökokous 12.4.2026"
   #   source_document: "Yhtiökokouksen pöytäkirja 12.4.2026"   # nimi, ei polku
   #   status: confirmed                 # provisional | confirmed
   #   members:
-  #     - person_id: etunimi-sukunimi
+  #     - person_id: etunimi-sukunimi   # pienet kirjaimet, väliviiva; pysyy samana kaudesta toiseen
   #       display_name: Etunimi Sukunimi
   #       board_role: chair             # chair | vice_chair | member | deputy
   #       valid_from: 2026-04-12
   #       valid_until: null
-  #       decision_right: true          # varajäsenellä false, ellei toimi jäsenen sijasta
+  #       decision_right: true          # varajäsenellä false — hän saa päätösoikeuden vain sijaisena
   #       executive_role: null          # ceo, jos jäsen on myös toimitusjohtaja
   #       elected_by: "Yhtiökokous 12.4.2026"
   #       role_elected_by: "Hallituksen järjestäytymiskokous 12.4.2026"   # pj/vpj-rooli
   []
 
 ceo:
-  # Toimitusjohtaja, myös jos ei ole hallituksen jäsen.
+  # Toimitusjohtaja, myös jos ei ole hallituksen jäsen. Osallistuminen kokoukseen
+  # kirjataan kokoustietueen roles.ceo_participation-kenttään.
   person_id: null
   display_name: null
   valid_from: null
   valid_until: null
   appointed_by: null          # hallituksen päätös, esim. DEC-000012
 
-# Menettelyt, jotka riippuvat kokoonpanosta
-signature_policy:
-  required_signers: all_members_in_term      # all_members_in_term | chair_plus_one
-  includes_absent_members: true
+# ---------------------------------------------------------------- menettelysäännöt
+# Päätösvaltaisuus. Laki (OYL 6:3 §): yli puolet valituista jäsenistä. Yhtiöjärjestys
+# voi vain tiukentaa — fraction (esim. 2/3) tai min_count (esim. vähintään 3).
+# Validointi soveltaa aina lain vähimmäisvaatimusta JA tässä annettua lisäehtoa.
+quorum_rule:
+  type: more_than_half          # more_than_half | fraction | min_count
+  numerator: null
+  denominator: null
+  min_count: null
+  source: "OYL 6:3 § — yli puolet jäsenistä"    # tai yhtiöjärjestyksen kohta
+  tie_break: chair_casting_vote # OYL 6:3 §: äänten mennessä tasan puheenjohtajan ääni; vaaleissa arpa
 
+# Allekirjoitus. OYL 6:6 §: pöytäkirjan allekirjoittaa kokouksen puheenjohtaja ja,
+# jos hallituksessa on useita jäseniä, vähintään yksi hallituksen siihen valitsema
+# jäsen. Se on lain vähimmäisvaatimus ja tämän templaten oletus. Yhtiö voi valita
+# kaikkien jäsenten allekirjoituksen omaksi käytännökseen — mutta allekirjoitus
+# ei tee poissa olleesta osallistujaa, ja tarkastus (reviewed_by) on eri asia
+# kuin allekirjoitus. Yksijäsenisessä hallituksessa allekirjoittaa jäsen itse.
+signature_policy:
+  required_signers: chair_plus_one      # chair_plus_one | all_members_in_term | all_present_members
+  includes_absent_members: false        # true vain jos yhtiön käytäntö on kaikkien allekirjoitus
+  source: "OYL 6:6 §"
+
+# Tarkastus ennen allekirjoitusta — kirjataan kokoustietueen reviewed_by-kenttään.
 review_policy:
-  required_reviewers: all_members_in_term
+  required_reviewers: all_members_in_term   # all_members_in_term | all_present_members | chair_only
   content_change_starts_new_round: true
 
 secretary:

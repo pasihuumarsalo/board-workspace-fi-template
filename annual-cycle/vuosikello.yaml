@@ -1,7 +1,9 @@
-# Hallituksen vuosikello. Lakisääteinen runko on valmiina; muut asiat lisätään
-# käyttöönotossa (ALOITUS.md, vaihe 7). Kuukausi = milloin asia on käsiteltävä
+# Hallituksen vuosikello. Lakisääteinen runko on valmiina (items). Hallituksen
+# valvonta- ja kehitysasiat ovat optional_catalog-listassa: agentti tarjoaa ne
+# käyttöönotossa (ALOITUS.md, vaihe 7) yhtiökohtaisesti valittaviksi, eikä yhtään
+# niistä aseteta pakolliseksi. Valittu asia siirretään items-listaan. Kuukausi = milloin asia on käsiteltävä
 # viimeistään; null = sidottu tapahtumaan, ei kuukauteen.
-schema_version: 1
+schema_version: 2
 record_type: annual_cycle
 status: provisional               # provisional | formally_approved (hallitus hyväksynyt)
 fiscal_year_end_month: null       # täytä; lakisääteiset määräajat lasketaan tästä
@@ -53,21 +55,23 @@ items:
     decision_required: false
     recurring: after_each_meeting
 
-  # --- Yhtiön omat, lisätään käyttöönotossa ---
-  # - id: VK-08
-  #   topic: Budjetti ja tavoitteet seuraavalle vuodelle
-  #   month: 11
-  #   decision_required: true
-  #   recurring: yearly
-  # - id: VK-09
-  #   topic: Riskien ja vakuutusten tarkastelu
-  #   month: 9
-  #   decision_required: false
-  #   recurring: yearly
-  # - id: VK-10
-  #   topic: Strategian tarkistus / strategiapäivä
-  #   month: null
-  #   decision_required: mahdollinen
-  #   recurring: yearly
+
+# ---------------------------------------------------------------- valinnaiset
+# Ei pakollisia. Agentti kysyy käyttöönotossa jokaisesta: otetaanko vuosikelloon?
+# Kun otetaan: siirrä items-listaan, anna kuukausi ja päivitä adopted: true.
+optional_catalog:
+  - {id: VK-OPT-01, topic: "Budjetti ja tavoitteet seuraavalle vuodelle", recurring: yearly, decision_required: true, adopted: false}
+  - {id: VK-OPT-02, topic: "Ennuste, kassavirta ja maksuvalmius", recurring: quarterly, decision_required: false, adopted: false}
+  - {id: VK-OPT-03, topic: "Strategian seuranta ja tarkistus (strategiapäivä)", recurring: yearly, decision_required: mahdollinen, adopted: false}
+  - {id: VK-OPT-04, topic: "Riskit ja mahdollisuudet", recurring: yearly, decision_required: false, adopted: false}
+  - {id: VK-OPT-05, topic: "Vakuutusten kattavuus", recurring: yearly, decision_required: false, adopted: false}
+  - {id: VK-OPT-06, topic: "Sisäinen valvonta ja kirjanpidon järjestäminen (OYL 6:2 §)", recurring: yearly, decision_required: false, adopted: false}
+  - {id: VK-OPT-07, topic: "Lähipiiritapahtumat ja esteellisyyksien kartoitus", recurring: yearly, decision_required: false, adopted: false}
+  - {id: VK-OPT-08, topic: "Toimitusjohtajan tavoitteet ja arviointi", recurring: yearly, decision_required: mahdollinen, adopted: false}
+  - {id: VK-OPT-09, topic: "Seuraajasuunnittelu (toimitusjohtaja, avainhenkilöt)", recurring: yearly, decision_required: false, adopted: false}
+  - {id: VK-OPT-10, topic: "Tietoturva ja toiminnan jatkuvuus", recurring: yearly, decision_required: false, adopted: false}
+  - {id: VK-OPT-11, topic: "Henkilöstön avainriskit", recurring: yearly, decision_required: false, adopted: false}
+  - {id: VK-OPT-12, topic: "Merkittävät investoinnit ja sopimukset — hyväksyntärajojen tarkistus", recurring: yearly, decision_required: mahdollinen, adopted: false}
+  - {id: VK-OPT-13, topic: "Työtilan käyttöoikeuksien ja varmuuskopioiden tarkistus", basis: "governance/07", recurring: yearly, decision_required: false, adopted: false}
 
 open_items: []

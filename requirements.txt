@@ -1,0 +1,5 @@
+# Työtilan Python-työkalujen riippuvuudet.
+#   pip install -r requirements.txt
+python-docx>=1.1      # templates/tee-poytakirja.py, templates/luo-pohja.py
+PyYAML>=6.0           # kaikki rekisteriä lukevat skriptit
+jsonschema>=4.0       # scripts/validoi-tyotila.py — skeematarkistus

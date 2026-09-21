@@ -11,7 +11,8 @@ Se on tarkoitettu **listaamattomille yhtiöille**: operatiivisille yhtiöille, h
 - Kokoonpanorekisteri, josta näkee kuka oli hallituksen jäsen minäkin päivänä
 - Toimivallan rajat yhtiöjärjestyksestä, yhtiökokouksista ja osakassopimuksesta — vain hallitusta koskevat kohdat
 - Vuosikello, kokousluonnokset, havainnot ja esityslistaehdotukset
-- Pöytäkirjan muodostaminen rekisteristä valmiille Word-pohjalle
+- Pöytäkirjan — ja päätöksen ilman kokousta — muodostaminen rekisteristä Word-pohjalle. Osallistujat, esteellisyydet, äänestykset ja allekirjoittajat tulevat rekisteristä, ei pohjaan käsin kirjoitetuista nimistä
+- Koneellinen tarkistus: skeema, tunnusten eheys, päätösvaltaisuus jokaisessa asiassa, koollekutsu, allekirjoittajat. **Valmis asiakirja syntyy vain, kun tarkistus on puhdas**
 
 **Ei ole:**
 - **Ei määrittele, miten hallituksen pitäisi työskennellä.** Se kirjaa sen, mitä hallitus tekee.
@@ -33,7 +34,7 @@ Päätösrekisteri perusteluineen on se näyttö, jolla huolellisuusvelvollisuus
 2. **Avaa repo tekoälyagentissa**, joka lukee `AGENTS.md`:n (esim. Claude Code, Cursor).
 3. **Sano agentille: "Aloita käyttöönotto"** — tai avaa itse [`ALOITUS.md`](ALOITUS.md). Agentti kysyy yhtiön perustiedot, hallituksen kokoonpanon, aiemmat pöytäkirjat ja kokousrytmin, ja täyttää työtilan niiden perusteella.
 
-Tarvitset: Git-tilin, tekoälyagentin ja — jos haluat tuottaa pöytäkirjoja rekisteristä — Python 3:n ja `python-docx`-kirjaston.
+Tarvitset: Git-tilin, tekoälyagentin ja Python 3:n. Python-riippuvuudet asennetaan `pip install -r requirements.txt` (python-docx, PyYAML, jsonschema).
 
 ## Rakenne
 
@@ -46,26 +47,40 @@ decisions/         päätösrekisteri tilikausittain
 meetings/          kokousluonnokset (elävät vain kokouksen ajan)
 annual-cycle/      vuosikello
 board-work/        havainnot, ideat, riskit, esityslistaehdotukset
-templates/         pöytäkirjapohja ja generaattori
-scripts/           aputyökalut
+templates/         asiakirjapohjat (kokous, päätös ilman kokousta) ja generaattori
+schema/            koneelliset skeemat YAML-tiedostoille
+scripts/           validaattori, sisältötarkistus, yhteinen kirjasto
+tests/             sääntötestit (python -m unittest discover -s tests)
 ```
 
 Kansioiden ja YAML-kenttien nimet ovat englanniksi, sisältö suomeksi. Näin tekniset nimet pysyvät vakaina, kun sisältöä muokataan.
+
+## Tarkistukset — kirjalliset rajat koneellisesti valvottuina
+
+| Komento | Mitä tekee |
+|---|---|
+| `python scripts/validoi-tyotila.py` | Skeema, tunnusten eheys (ei aukkoja, ei kahdesti), kokoonpanon aikarajat, päätösvaltaisuus kokous- **ja päätöskohtaisesti** (esteellinen ei osallistu), koollekutsu, allekirjoittajat, viittaukset. Tulostaa seuraavat vapaat tunnukset ja voimassa olevien päätösten määrän kaikista tilikausista. Paluuarvo 1, jos estävä virhe |
+| `python scripts/tarkista-sisalto.py` | Henkilötunnukset (kaikki vuosisatamerkit, tarkistusmerkki), salaisuudet, kielletyt merkkijonot — tekstitiedostoista **ja Word-tiedostoista**. Luettelee tiedostot, joita ei voinut tarkistaa |
+| `python templates/tee-poytakirja.py PTK-000073` | Luonnos aina; `--valmis` vain, jos validointi on puhdas — muuten kieltäytyy ja tulostaa virheluettelon. Parametri ei ohita porttia |
+| `python -m unittest discover -s tests` | Sääntötestit: 15 skenaariota (yksijäseninen hallitus, varajäsen, esteellisyys, äänestys, päätös ilman kokousta, …) |
+
+Samat tarkistukset ajetaan commit-koukussa (`git config core.hooksPath .githooks`) ja GitHub Actionsissa (`.github/workflows/tarkistukset.yml`). Löydöksillä on kolme tasoa: **ERROR** estää valmiin pöytäkirjan, **WARNING** vaatii ihmisen tarkistuksen, **INFO** on huomio.
 
 ## Periaatteet, joihin kaikki nojaa
 
 1. **Rekisteri on kopio, allekirjoitettu pöytäkirja on alkuperäinen.** Jokainen päätösteksti kantaa tiedon siitä, onko se kopio vai odottaako se allekirjoitusta.
 2. **Kopio ja tulkinta ovat eri asioita.** Se, sitooko päätös yhä, on tulkinta — ja tulkinta on merkitty vahvistamattomaksi kunnes ihminen vahvistaa sen.
-3. **Menettelypykälät eivät ole päätöksiä.** Kokouksen avaus, päätösvaltaisuus ja esityslistan hyväksyminen kirjataan kokouksen ominaisuuksina, eivät päätöstunnuksina. Päätösvaltaisuus lasketaan kokoonpanosta, ei kirjoiteta.
+3. **Menettelypykälät eivät ole päätöksiä.** Kokouksen avaus, päätösvaltaisuus ja esityslistan hyväksyminen kirjataan kokouksen ominaisuuksina, eivät päätöstunnuksina. Päätösvaltaisuus lasketaan kokoonpanosta, ei kirjoiteta — ja se lasketaan **jokaiselle asialle erikseen**, koska esteellinen jäsen ei osallistu asian käsittelyyn.
 4. **Numerointi on juoksevaa ja jatkuvaa.** Kokous 73, ei 8/2026.
 5. **Henkilötunnuksia ei kirjata koskaan.** Ei sopimusten sisältöä — vain hallitusta koskevat rajoitteet.
 6. **Yhtiökokous on työtilan yläpuolella.** Sen pöytäkirjoja ei rekisteröidä päätöksinä; niistä poimitaan hallitusta koskevat velvoitteet.
+7. **Kirjallinen raja on koneellinen raja.** Se, mitä nämä dokumentit kieltävät, tarkistetaan skripteillä: valmis asiakirja, tunnukset, päätösvaltaisuus, henkilötunnukset. Agentti ei voi ohittaa porttia parametrilla.
 
 Täysi kuvaus: [`governance/`](governance/README.md).
 
 ## Vastuuvapaus
 
-Tämä työtila ja sen ohjeet **eivät ole oikeudellista neuvontaa**. Ne on laadittu yleiseksi apuvälineeksi eikä niiden käyttö takaa osakeyhtiölain, yhtiöjärjestyksen tai muun sääntelyn noudattamista. Hallitus vastaa aina itse toiminnastaan ja päätöksistään. Jos et ole varma jonkin kirjauksen tai menettelyn oikeellisuudesta, kysy asiantuntijalta. Tekijä ei vastaa työtilan käytöstä aiheutuvista vahingoista.
+Tämä työtila ja sen ohjeet **eivät ole oikeudellista neuvontaa**. Ne on laadittu yleiseksi apuvälineeksi eikä niiden käyttö takaa osakeyhtiölain, yhtiöjärjestyksen tai muun sääntelyn noudattamista. Hallitus vastaa aina itse toiminnastaan ja päätöksistään. Jos et ole varma jonkin kirjauksen tai menettelyn oikeellisuudesta, kysy asiantuntijalta. **Osakeyhtiölakia koskevat kohdat, joita ei ole tarkistettu yhtiöoikeuteen perehtyneellä juristilla, on merkitty `provisional`-tilaan** [`governance/05`](governance/05-lainmukaisuus-ja-rajat.md):ssä. Tekijä ei vastaa työtilan käytöstä aiheutuvista vahingoista.
 
 ## Lisenssi
 
