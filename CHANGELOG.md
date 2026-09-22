@@ -2,7 +2,7 @@
 
 ## 0.2.0 — 2026-09-21: kirjalliset rajat koneellisiksi
 
-Vastaus kehitysarvioon [`KEHITYSARVIO-CLAUDELLE.md`](KEHITYSARVIO-CLAUDELLE.md) (21.9.2026). Sen ydinhavainto oli, että työtilan turvarajat olivat dokumentaatiossa mutta eivät koodissa. Tässä versiossa jokainen raja, jonka voi tarkistaa koneellisesti, tarkistetaan.
+Vastaus ulkopuoliseen kehitysarvioon (21.9.2026), joka luettiin repoon työskentelyn ajaksi ja poistettiin sen valmistuttua — se on yhä git-historiassa commitissa `c1136ba`, tiedostonimellä `KEHITYSARVIO-CLAUDELLE.md`. Alla olevat tunnukset P0-1…P1-12 ovat sen omia, ja jokaisen vaatimus on kirjoitettu tähän auki, joten tämä luku on luettavissa ilman alkuperäistä. Sen ydinhavainto oli, että työtilan turvarajat olivat dokumentaatiossa mutta eivät koodissa. Tässä versiossa jokainen raja, jonka voi tarkistaa koneellisesti, tarkistetaan.
 
 ### Kriittiset (P0)
 
